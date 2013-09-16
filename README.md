@@ -60,10 +60,34 @@ Goldilocks itself is capabable of detecting the current balance in a Bitcoin wal
       "amount" : "0.002 BTC",
       "frequency" : "0 5 * * *"
     }
+  ],
+  "template" : [
+    {
+      "name" : "overview",
+      "source" : "/srv/goldilocks/templates/overview",
+      "output" : "/srv/www/gl/index.html"
+    },
+    {
+      "name" : "global json dump",
+      "source" : "core.json",
+      "output" : "/srv/www/gl/core.json"
+    }
   ]
 }
 ```
 
+### Services
+
 Service entries use bitcoin RPC to verify that the address has more money than the threshold, starting or stopping the service as necessary based on the commands specified.
 
+### Schedules
+
 Schedule entries regularly move money from one address to another using RPC, using the cron schedule syntax.
+
+### Templates
+
+Template entries use the [Go template module](http://golang.org/pkg/html/template/) to produce HTML static files, that are updated whenever Goldilocks internal state updates. You can either serve these directly by saving them to your web server's static file tree, which allows for very efficient/cheap availability.
+
+For more "involved" uses, you can also save a dump of all (non-security-risk) internal state as a JSON, YAML, or bencode file, using special sources "core.json", "core.yaml", and "core.bencode", respectively.
+
+Your OS's filesystem caching should be perfectly sufficient to ensure that this information is cached in-memory for your application, without requiring a disk hit.
