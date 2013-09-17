@@ -47,7 +47,7 @@ func main() {
         cmnd_map := getSubcommandMap()
         cmnd, ok := cmnd_map[subcommand] 
         if ok {
-            cmnd.Run(args[0:])
+            cmnd.Run(args[1:])
         } else {
             fmt.Printf("No command '%s' known\n\n", subcommand)
             usage()
