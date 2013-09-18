@@ -1,0 +1,42 @@
+{
+    "meta": {
+        "admin": "Scooby Doo",
+        "contact": "1-800-555-1334"
+    },
+    "rpc_alias": {
+        "default": "Kalamazoo"
+    },
+    "services":  [
+        {
+            "name": "nginx",
+            "description" : "Turn nginx on and off",
+            "address"     : "<some long bitcoin addr>",
+            "threshold"   : "0 BTC",
+            "commands"    : {
+                "start" : "sudo /bin/goldilocks_start",
+                "stop"  : "sudo /bin/goldilocks_stop",
+                "status": "pgrep nginx"
+            }
+        }
+    ],
+    "schedules": [
+        {
+          "from" : "<same bt addr as earlier>",
+          "to" : "<personal bt addr>",
+          "amount" : "0.002 BTC",
+          "frequency" : "0 5 * * *"
+        }
+    ],
+    "templates": [
+        {
+          "name" : "overview",
+          "source" : "/srv/goldilocks/templates/overview",
+          "output" : "/srv/www/gl/index.html"
+        },
+        {
+          "name" : "global json dump",
+          "source" : "core.json",
+          "output" : "/srv/www/gl/core.json"
+        }
+    ]
+}
