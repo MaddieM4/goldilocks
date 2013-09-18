@@ -33,6 +33,7 @@ func TestRead(t *testing.T) {
             "sudo /bin/goldilocks_stop",
             "pgrep nginx",
         },
+        "",
     }
     if service != expected_service {
         t.Errorf("Incorrect service data")
@@ -44,10 +45,12 @@ func TestRead(t *testing.T) {
     }
     schedule := config.Schedules[0]
     expected_schedule := GLConfigSchedule{
+        "Daily retrieval",
         "<same bt addr as earlier>",
         "<personal bt addr>",
         "0.002 BTC",
         "0 5 * * *",
+        "",
     }
     if schedule != expected_schedule {
         t.Errorf("Incorrect schedule data")
@@ -74,5 +77,32 @@ func TestRead(t *testing.T) {
     }
     if template != expected_template {
         t.Errorf("Incorrect template data for %s", expected_template.Name)
+    }
+}
+
+func TestValidateFromRead(t *testing.T) {
+    path := "example.conf.json"
+    config, err := GetConfig(path)
+    if err != nil {
+        t.Errorf("Got error %v", err)
+    }
+
+    ok := ValidateConfig(&config)
+    if ! ok {
+        t.Errorf("Validation failed")
+    }
+}
+
+func TestValidateNoDefaultRPC(t *testing.T) {
+    path := "example.conf.json"
+    config, err := GetConfig(path)
+    if err != nil {
+        t.Errorf("Got error %v", err)
+    }
+
+    delete(config.RPC, "default")
+    ok := ValidateConfig(&config)
+    if ok {
+        t.Errorf("Validation should have failed")
     }
 }

@@ -21,22 +21,23 @@
     ],
     "schedules": [
         {
-          "from" : "<same bt addr as earlier>",
-          "to" : "<personal bt addr>",
-          "amount" : "0.002 BTC",
-          "frequency" : "0 5 * * *"
+            "name" : "Daily retrieval",
+            "from" : "<same bt addr as earlier>",
+            "to" : "<personal bt addr>",
+            "amount" : "0.002 BTC",
+            "frequency" : "0 5 * * *"
         }
     ],
     "templates": [
         {
-          "name" : "overview",
-          "source" : "/srv/goldilocks/templates/overview",
-          "output" : "/srv/www/gl/index.html"
+            "name" : "overview",
+            "source" : "/srv/goldilocks/templates/overview",
+            "output" : "/srv/www/gl/index.html"
         },
         {
-          "name" : "global json dump",
-          "source" : "core.json",
-          "output" : "/srv/www/gl/core.json"
+            "name" : "global json dump",
+            "source" : "core.json",
+            "output" : "/srv/www/gl/core.json"
         }
     ]
 }
