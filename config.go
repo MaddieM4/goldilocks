@@ -4,6 +4,7 @@ import "encoding/json"
 import "io"
 import "io/ioutil"
 import "os"
+import "reflect"
 
 const DEFAULT_PATH string = "/etc/goldilocks.conf"
 
@@ -71,44 +72,81 @@ func GetConfig(path string) (config GLConfig, err error) {
         return
     }
     config, err = GetConfigFromReader(r)
+    if err != nil {
+        return
+    }
+    err = ValidateConfig(&config)
+    if err != nil {
+        return
+    }
     return
 }
 
-func ValidateConfig(config *GLConfig) (bool) {
+type GLConfigValidationError struct {
+    Location string
+    Problem string
+}
+
+func (e *GLConfigValidationError) Error() string {
+    return "Failure to validate " + e.Location + ": " + e.Problem
+}
+
+func ValidateConfStruct(s interface{}) (err error) {
+    structtype := reflect.TypeOf(s)
+    structval  := reflect.ValueOf(s)
+    structname := structtype.Name()
+
+    for i := 0; i < structtype.NumField(); i++ {
+        field := structval.Field(i)
+        fieldname := structtype.Field(i).Name
+
+        if field.Kind() == reflect.String && field.String() == "" {
+            err = &GLConfigValidationError{
+                structname + "." + fieldname,
+                "was blank string",
+            }
+            return
+        } else if field.Kind() == reflect.Struct {
+            err = ValidateConfStruct(field.Interface())
+            if err != nil { return }
+        }
+    }
+    return
+}
+
+func ValidateConfig(config *GLConfig) (err error) {
     // Ensure that all necessary data for operation is present
     
     default_rpc, ok := config.RPC["default"]
-    if ! ok { return false }
+    if ! ok { 
+        err = &GLConfigValidationError{
+            "GLConfig.RPC",
+            "No default RPC address",
+        }
+        return
+    }
 
     for _, service := range config.Services {
-        if service.Name    == "" { return false }
-        if service.Address == "" { return false }
-        if service.Commands.Start  == "" { return false }
-        if service.Commands.Stop   == "" { return false }
-        if service.Commands.Status == "" { return false }
-
         if service.RPC == "" { 
             service.RPC = default_rpc
         }
+
+        err = ValidateConfStruct(service)
+        if err != nil { return }
     }
 
     for _, schedule := range config.Schedules {
-        if schedule.Name      == "" { return false }
-        if schedule.From      == "" { return false }
-        if schedule.To        == "" { return false }
-        if schedule.Amount    == "" { return false }
-        if schedule.Frequency == "" { return false }
-
         if schedule.RPC == "" { 
             schedule.RPC = default_rpc
         }
+
+        err = ValidateConfStruct(schedule)
+        if err != nil { return }
     }
 
     for _, template := range config.Templates {
-        if template.Name   == "" { return false }
-        if template.Source == "" { return false }
-        if template.Output == "" { return false }
+        err = ValidateConfStruct(template)
+        if err != nil { return }
     }
-
-    return true
+    return
 }

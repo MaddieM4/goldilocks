@@ -5,6 +5,7 @@ import "testing"
 func assert(success bool, t *testing.T, msg string) {
     if success == false {
         t.Errorf(msg)
+        return
     }
 }
 
@@ -13,14 +14,17 @@ func TestRead(t *testing.T) {
     config, err := GetConfig(path)
     if err != nil {
         t.Errorf("Got error %v", err)
+        return
     }
     if len(config.Meta) != 2 {
         t.Errorf("Expected 2 items of metadata")
+        return
     }
 
     // Compare services ====================================
     if len(config.Services) != 1 {
         t.Errorf("Expected 1 services")
+        return
     }
     service := config.Services[0]
     expected_service := GLConfigService{
@@ -37,11 +41,13 @@ func TestRead(t *testing.T) {
     }
     if service != expected_service {
         t.Errorf("Incorrect service data")
+        return
     }
 
     // Compare schedules ===================================
     if len(config.Schedules) != 1 {
         t.Errorf("Expected 1 schedule")
+        return
     }
     schedule := config.Schedules[0]
     expected_schedule := GLConfigSchedule{
@@ -54,11 +60,13 @@ func TestRead(t *testing.T) {
     }
     if schedule != expected_schedule {
         t.Errorf("Incorrect schedule data")
+        return
     }
 
     // Compare templates ===================================
     if len(config.Templates) != 2 {
         t.Errorf("Expected 2 templates")
+        return
     }
     template := config.Templates[0]
     expected_template := GLConfigTemplate{
@@ -68,6 +76,7 @@ func TestRead(t *testing.T) {
     }
     if template != expected_template {
         t.Errorf("Incorrect template data for %s", expected_template.Name)
+        return
     }
     template = config.Templates[1]
     expected_template = GLConfigTemplate{
@@ -77,6 +86,7 @@ func TestRead(t *testing.T) {
     }
     if template != expected_template {
         t.Errorf("Incorrect template data for %s", expected_template.Name)
+        return
     }
 }
 
@@ -85,11 +95,13 @@ func TestValidateFromRead(t *testing.T) {
     config, err := GetConfig(path)
     if err != nil {
         t.Errorf("Got error %v", err)
+        return
     }
 
-    ok := ValidateConfig(&config)
-    if ! ok {
+    err = ValidateConfig(&config)
+    if err != nil {
         t.Errorf("Validation failed")
+        return
     }
 }
 
@@ -98,11 +110,37 @@ func TestValidateNoDefaultRPC(t *testing.T) {
     config, err := GetConfig(path)
     if err != nil {
         t.Errorf("Got error %v", err)
+        return
     }
 
     delete(config.RPC, "default")
-    ok := ValidateConfig(&config)
-    if ok {
+    err = ValidateConfig(&config)
+    if err == nil {
         t.Errorf("Validation should have failed")
+        return
+    }
+    expected_error := "Failure to validate GLConfig.RPC: No default RPC address"
+    if err.Error() != expected_error {
+        t.Errorf("Expected '%s', got '%s'", expected_error, err.Error())
+    }
+}
+
+func TestValidateNoStopCommand(t *testing.T) {
+    path := "example.conf.json"
+    config, err := GetConfig(path)
+    if err != nil {
+        t.Errorf("Got error %v", err)
+    }
+
+    config.Services[0].Commands.Stop = ""
+    err = ValidateConfig(&config)
+    if err == nil {
+        t.Errorf("Validation should have failed")
+        return
+    }
+    expected_error := "Failure to validate GLConfigCommands.Stop: was blank string"
+    if err.Error() != expected_error {
+        t.Errorf("Expected '%s', got '%s'", expected_error, err.Error())
+        return
     }
 }
