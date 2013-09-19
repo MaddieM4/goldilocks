@@ -6,7 +6,8 @@ import "io/ioutil"
 import "os"
 import "reflect"
 
-const DEFAULT_PATH string = "/etc/goldilocks.conf"
+const DEFAULT_PATH      string = "/etc/goldilocks.conf"
+const ENV_VARIABLE_NAME string = "GOLDILOCKS_CONFIG"
 
 type GLConfig struct {
     Meta map[string]interface{}  `json:"meta"`
@@ -57,17 +58,23 @@ func GetConfigFromReader(r io.Reader) (config GLConfig, err error) {
     return
 }
 
-func GetConfigReader(path string) (r io.Reader, err error) {
-    // Attempt to load from specific path
-    r, err = os.Open(path)
-    if err != nil {
-        r, err = os.Open(DEFAULT_PATH)
+func GetConfigReader(paths []string) (r io.Reader, err error) {
+    // Get first working reader from paths slice
+    for _, path := range paths {
+        r, err = os.Open(path)
+        if err == nil { return }
     }
     return
 }
 
 func GetConfig(path string) (config GLConfig, err error) {
-    r, err := GetConfigReader(path)
+    paths := []string{
+        path,
+        os.Getenv(ENV_VARIABLE_NAME),
+        DEFAULT_PATH,
+    }
+
+    r, err := GetConfigReader(paths)
     if err != nil {
         return
     }
