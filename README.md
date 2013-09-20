@@ -37,42 +37,43 @@ Goldilocks itself is capabable of detecting the current balance in a Bitcoin wal
 
 ```json
 {
-  "rpc_alias" : {
-    "default" : "https://alladin:opensesame@localhost/"
-  },
-  "services" : [
-    {
-      "name" : "nginx",
-      "description" : "Turn nginx on and off",
-      "address" : "<some long bitcoin addr>",
-      "threshold" : "0 BTC",
-      "commands" : {
-        "start": "sudo /bin/goldilocks_start",
-        "stop": "sudo /bin/goldilocks_stop",
-        "status": "pgrep nginx"
-      }
-    }
-  ],
-  "schedule" : [
-    {
-      "from" : "<same bt addr as earlier>",
-      "to" : "<personal bt addr>",
-      "amount" : "0.002 BTC",
-      "frequency" : "0 5 * * *"
-    }
-  ],
-  "template" : [
-    {
-      "name" : "overview",
-      "source" : "/srv/goldilocks/templates/overview",
-      "output" : "/srv/www/gl/index.html"
+    "meta": {
+        "admin": "Scooby Doo",
+        "contact": "1-800-555-1334"
     },
-    {
-      "name" : "global json dump",
-      "source" : "core.json",
-      "output" : "/srv/www/gl/core.json"
+    "rpc_alias": {
+        "default" : "https://alladin:opensesame@localhost/"
+    },
+    "services":  {
+        "nginx" : {
+            "description" : "Turn nginx on and off",
+            "address"     : "<some long bitcoin addr>",
+            "threshold"   : "0 BTC",
+            "commands"    : {
+                "start" : "sudo /bin/goldilocks_start",
+                "stop"  : "sudo /bin/goldilocks_stop",
+                "status": "pgrep nginx"
+            }
+        }
+    },
+    "schedules": {
+        "daily_retrieval" : {
+            "from" : "<same bt addr as earlier>",
+            "to" : "<personal bt addr>",
+            "amount" : "0.002 BTC",
+            "frequency" : "0 5 * * *"
+        }
+    },
+    "templates": {
+        "overview" : {
+            "source" : "/srv/goldilocks/templates/overview",
+            "output" : "/srv/www/gl/index.html"
+        },
+        "global_json_dump" : {
+            "source" : "core.json",
+            "output" : "/srv/www/gl/core.json"
+        }
     }
-  ]
 }
 ```
 

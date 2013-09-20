@@ -26,9 +26,8 @@ func TestRead(t *testing.T) {
         t.Errorf("Expected 1 services")
         return
     }
-    service := config.Services[0]
+    service := config.Services["nginx"]
     expected_service := GLConfigService{
-        "nginx",
         "Turn nginx on and off",
         "<some long bitcoin addr>",
         "0 BTC",
@@ -49,9 +48,8 @@ func TestRead(t *testing.T) {
         t.Errorf("Expected 1 schedule")
         return
     }
-    schedule := config.Schedules[0]
+    schedule := config.Schedules["daily_retrieval"]
     expected_schedule := GLConfigSchedule{
-        "Daily retrieval",
         "<same bt addr as earlier>",
         "<personal bt addr>",
         "0.002 BTC",
@@ -68,25 +66,22 @@ func TestRead(t *testing.T) {
         t.Errorf("Expected 2 templates")
         return
     }
-    template := config.Templates[0]
-    expected_template := GLConfigTemplate{
-        "overview",
-        "/srv/goldilocks/templates/overview",
-        "/srv/www/gl/index.html",
+    expected_templates := map[string]GLConfigTemplate{
+        "overview": GLConfigTemplate{
+            "/srv/goldilocks/templates/overview",
+            "/srv/www/gl/index.html",
+        },
+        "global_json_dump": GLConfigTemplate{
+            "core.json",
+            "/srv/www/gl/core.json",
+        },
     }
-    if template != expected_template {
-        t.Errorf("Incorrect template data for %s", expected_template.Name)
-        return
-    }
-    template = config.Templates[1]
-    expected_template = GLConfigTemplate{
-        "global json dump",
-        "core.json",
-        "/srv/www/gl/core.json",
-    }
-    if template != expected_template {
-        t.Errorf("Incorrect template data for %s", expected_template.Name)
-        return
+    for name, expected := range expected_templates {
+        template := config.Templates[name]
+        if template != expected {
+            t.Errorf("Incorrect template data for '%s'", name)
+            return
+        }
     }
 }
 
@@ -132,7 +127,14 @@ func TestValidateNoStopCommand(t *testing.T) {
         t.Errorf("Got error %v", err)
     }
 
-    config.Services[0].Commands.Stop = ""
+    service_name := "nginx"
+    service, ok  := config.Services[service_name]
+    if ! ok {
+        t.Errorf("No service '%s'", service_name)
+    }
+    service.Commands.Stop = ""
+    config.Services[service_name] = service
+
     err = ValidateConfig(&config)
     if err == nil {
         t.Errorf("Validation should have failed")

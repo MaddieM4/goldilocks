@@ -4,11 +4,10 @@
         "contact": "1-800-555-1334"
     },
     "rpc_alias": {
-        "default": "Kalamazoo"
+        "default" : "https://alladin:opensesame@localhost/"
     },
-    "services":  [
-        {
-            "name": "nginx",
+    "services":  {
+        "nginx" : {
             "description" : "Turn nginx on and off",
             "address"     : "<some long bitcoin addr>",
             "threshold"   : "0 BTC",
@@ -18,26 +17,23 @@
                 "status": "pgrep nginx"
             }
         }
-    ],
-    "schedules": [
-        {
-            "name" : "Daily retrieval",
+    },
+    "schedules": {
+        "daily_retrieval" : {
             "from" : "<same bt addr as earlier>",
             "to" : "<personal bt addr>",
             "amount" : "0.002 BTC",
             "frequency" : "0 5 * * *"
         }
-    ],
-    "templates": [
-        {
-            "name" : "overview",
+    },
+    "templates": {
+        "overview" : {
             "source" : "/srv/goldilocks/templates/overview",
             "output" : "/srv/www/gl/index.html"
         },
-        {
-            "name" : "global json dump",
+        "global_json_dump" : {
             "source" : "core.json",
             "output" : "/srv/www/gl/core.json"
         }
-    ]
+    }
 }

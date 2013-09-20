@@ -10,15 +10,14 @@ const DEFAULT_PATH      string = "/etc/goldilocks.conf"
 const ENV_VARIABLE_NAME string = "GOLDILOCKS_CONFIG"
 
 type GLConfig struct {
-    Meta map[string]interface{}  `json:"meta"`
-    RPC  map[string]string       `json:"rpc_alias"`
-    Services  []GLConfigService  `json:"services"`
-    Schedules []GLConfigSchedule `json:"schedules"`
-    Templates []GLConfigTemplate `json:"templates"`
+    Meta map[string]interface{}           `json:"meta"`
+    RPC  map[string]string                `json:"rpc_alias"`
+    Services  map[string]GLConfigService  `json:"services"`
+    Schedules map[string]GLConfigSchedule `json:"schedules"`
+    Templates map[string]GLConfigTemplate `json:"templates"`
 }
 
 type GLConfigService struct {
-    Name        string           `json:"name"`
     Description string           `json:"description"`
     Address     string           `json:"address"`
     Threshold   string           `json:"threshold"`
@@ -33,7 +32,6 @@ type GLConfigCommands struct {
 }
 
 type GLConfigSchedule struct {
-    Name      string `json:"name"`
     From      string `json:"from"`
     To        string `json:"to"`
     Amount    string `json:"amount"`
@@ -42,7 +40,6 @@ type GLConfigSchedule struct {
 }
 
 type GLConfigTemplate struct {
-    Name string   `json:"name"`
     Source string `json:"source"`
     Output string `json:"output"`
 }
@@ -133,25 +130,47 @@ func ValidateConfig(config *GLConfig) (err error) {
         return
     }
 
-    for _, service := range config.Services {
+    for name, service := range config.Services {
         if service.RPC == "" { 
             service.RPC = default_rpc
         }
 
+        if name == "" {
+            err = &GLConfigValidationError{
+                "GLConfig.Services",
+                "Blank name",
+            }
+            return
+        }
         err = ValidateConfStruct(service)
         if err != nil { return }
     }
 
-    for _, schedule := range config.Schedules {
+    for name, schedule := range config.Schedules {
         if schedule.RPC == "" { 
             schedule.RPC = default_rpc
         }
 
+        if name == "" {
+            err = &GLConfigValidationError{
+                "GLConfig.Schedules",
+                "Blank name",
+            }
+            return
+        }
         err = ValidateConfStruct(schedule)
         if err != nil { return }
     }
 
-    for _, template := range config.Templates {
+    for name, template := range config.Templates {
+        if name == "" {
+            err = &GLConfigValidationError{
+                "GLConfig.Templates",
+                "Blank name",
+            }
+            return
+        }
+
         err = ValidateConfStruct(template)
         if err != nil { return }
     }
