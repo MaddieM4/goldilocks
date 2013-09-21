@@ -111,6 +111,23 @@ func TmplPrint(config *GLConfig, names []string) (error) {
     return nil
 }
 
+func TmplSet(config *GLConfig, names []string) (error) {
+    for _, name := range names {
+        conf_tmpl   := config.Templates[name]
+        source      := conf_tmpl.Source
+        output_path := conf_tmpl.Output
+
+        output_file, err := os.Create(output_path)
+        if err != nil {
+            return &TmplProcessingError{name,"open output of",source,err}
+        }
+
+        err = TmplOutput(output_file, config, name)
+        if err != nil { return err }
+    }
+    return nil
+}
+
 func (tmpl Tmpl) Run(args []string) {
     if len(args) < 1 {
         TmplPrintUsage(&tmpl)
@@ -149,8 +166,11 @@ func (tmpl Tmpl) Run(args []string) {
         }
     }
 
+    ConfigSanitize(&config)
     if directive == "print" {
         err = TmplPrint(&config, templates)
+    } else {
+        err = TmplSet(&config, templates)
     }
     if err != nil {
         fmt.Fprintf(os.Stderr,"goldilocks: %v\n",err)

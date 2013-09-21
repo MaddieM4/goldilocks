@@ -23,3 +23,7 @@ _testmain.go
 
 # Vim
 *.swp
+
+# Output by test stuff
+resources/tmpl/core.json
+resources/tmpl/overview.html
