@@ -1,6 +1,7 @@
 package main
 
 import "fmt"
+import "io"
 import "os"
 import "html/template"
 
@@ -56,6 +57,24 @@ func TmplPrintUsage(tmpl *Tmpl) {
     )
 }
 
+func TmplOutput(w io.Writer, config *GLConfig, name string) (error) {
+    conf_tmpl := config.Templates[name]
+
+    if conf_tmpl.Source == "core.json" {
+        // Output with special JSON dumper
+        ConfigDump(config, w)
+    } else {
+        // Output with normal template
+        tmpl_obj, err := template.ParseFiles(conf_tmpl.Source)
+        if err != nil { return err }
+
+        err = tmpl_obj.Execute(w, config)
+        if err != nil { return err }
+    }
+
+    return nil
+}
+
 func TmplPrint(config *GLConfig, names []string) {
     headers := (len(names) > 1)
 
@@ -66,23 +85,11 @@ func TmplPrint(config *GLConfig, names []string) {
 
         conf_tmpl := config.Templates[name]
 
-        tmpl_obj, err := template.ParseFiles(conf_tmpl.Source)
+        err := TmplOutput(os.Stdout, config, name)
         if err != nil {
             fmt.Fprintf(
                 os.Stderr,
-                "goldilocks: Failed to parse template '%s' (%s):\n%v\n",
-                name,
-                conf_tmpl.Source,
-                err,
-            )
-            return
-        }
-
-        err = tmpl_obj.Execute(os.Stdout, config)
-        if err != nil {
-            fmt.Fprintf(
-                os.Stderr,
-                "goldilocks: Failed to exec template '%s' (%s):\n%v\n",
+                "goldilocks: Failed to process template '%s' (%s):\n%v\n",
                 name,
                 conf_tmpl.Source,
                 err,

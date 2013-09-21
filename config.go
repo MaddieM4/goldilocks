@@ -121,7 +121,7 @@ func ValidateConfStruct(s interface{}) (err error) {
 func ValidateConfig(config *GLConfig) (err error) {
     // Ensure that all necessary data for operation is present
     
-    default_rpc, ok := config.RPC["default"]
+    _, ok := config.RPC["default"]
     if ! ok { 
         err = &GLConfigValidationError{
             "GLConfig.RPC",
@@ -132,7 +132,8 @@ func ValidateConfig(config *GLConfig) (err error) {
 
     for name, service := range config.Services {
         if service.RPC == "" { 
-            service.RPC = default_rpc
+            service.RPC = "default"
+            config.Services[name] = service
         }
 
         if name == "" {
@@ -148,7 +149,8 @@ func ValidateConfig(config *GLConfig) (err error) {
 
     for name, schedule := range config.Schedules {
         if schedule.RPC == "" { 
-            schedule.RPC = default_rpc
+            schedule.RPC = "default"
+            config.Schedules[name] = schedule
         }
 
         if name == "" {
@@ -175,4 +177,30 @@ func ValidateConfig(config *GLConfig) (err error) {
         if err != nil { return }
     }
     return
+}
+
+func ConfigSanitize(config *GLConfig) {
+    config.RPC = make(map[string]string)
+}
+
+func ConfigDump(config *GLConfig, w io.Writer) (error) {
+    // Serialized, sanitized, and ready to write.
+    ConfigSanitize(config)
+
+    data, err := json.MarshalIndent(config, "", "    ")
+    if err != nil { return err }
+
+    // Gotta be a better way to do this...
+    data = append(data, []byte("\n")...)
+
+    sent_total  := 0
+    data_length := len(data)
+    for sent_total < data_length {
+        sent_now, err := w.Write(data[sent_total:])
+        if err != nil { return err }
+
+        sent_total += sent_now
+    }
+
+    return nil
 }
