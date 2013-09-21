@@ -2,17 +2,14 @@
             <p>{{.Description}}</p>
             ({{.Threshold}} at {{.Address}})
         </li>
-{{end}}
-{{define "schedule"}}<li>
+{{end}}{{define "schedule"}}<li>
             <p>{{.From}} =&gt; ({{.To}}</p>
             <p>{{.Amount}} every {{.Frequency}}</p>
         </li>
-{{end}}
-{{define "template_meta"}}<li>
+{{end}}{{define "template_meta"}}<li>
             {{.Source}} =&gt; {{.Output}}
         </li>
-{{end}}
-<html>
+{{end}}<html>
 <head>
     <title>{{.Meta.overview_title}}</title>
 </head>

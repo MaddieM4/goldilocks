@@ -57,25 +57,47 @@ func TmplPrintUsage(tmpl *Tmpl) {
     )
 }
 
+type TmplProcessingError struct {
+    Name string
+    Action string
+    Source string
+    Original error
+}
+
+func (e *TmplProcessingError) Error() string {
+    return "Failed to " + e.Action +
+        " template '" + e.Name +"' (" + e.Source + "):" +
+        "\n" + e.Original.Error()
+}
+
 func TmplOutput(w io.Writer, config *GLConfig, name string) (error) {
     conf_tmpl := config.Templates[name]
+    source := conf_tmpl.Source
 
-    if conf_tmpl.Source == "core.json" {
+    if source == "core.json" {
         // Output with special JSON dumper
-        ConfigDump(config, w)
+        err := ConfigDump(config, w)
+        if err != nil { 
+            return &TmplProcessingError{name,"execute",source,err}
+        }
     } else {
         // Output with normal template
-        tmpl_obj, err := template.ParseFiles(conf_tmpl.Source)
-        if err != nil { return err }
+        
+        tmpl_obj, err := template.ParseFiles(source)
+        if err != nil { 
+            return &TmplProcessingError{name,"parse",source,err}
+        }
 
         err = tmpl_obj.Execute(w, config)
-        if err != nil { return err }
+        if err != nil { 
+            return &TmplProcessingError{name,"execute",source,err}
+        }
     }
 
     return nil
 }
 
-func TmplPrint(config *GLConfig, names []string) {
+func TmplPrint(config *GLConfig, names []string) (error) {
     headers := (len(names) > 1)
 
     for _, name := range names {
@@ -83,20 +105,10 @@ func TmplPrint(config *GLConfig, names []string) {
             fmt.Printf("\n==== %s ====\n", name)
         }
 
-        conf_tmpl := config.Templates[name]
-
         err := TmplOutput(os.Stdout, config, name)
-        if err != nil {
-            fmt.Fprintf(
-                os.Stderr,
-                "goldilocks: Failed to process template '%s' (%s):\n%v\n",
-                name,
-                conf_tmpl.Source,
-                err,
-            )
-            return
-        }
+        if err != nil { return err }
     }
+    return nil
 }
 
 func (tmpl Tmpl) Run(args []string) {
@@ -138,6 +150,9 @@ func (tmpl Tmpl) Run(args []string) {
     }
 
     if directive == "print" {
-        TmplPrint(&config, templates)
+        err = TmplPrint(&config, templates)
+    }
+    if err != nil {
+        fmt.Fprintf(os.Stderr,"goldilocks: %v\n",err)
     }
 }
