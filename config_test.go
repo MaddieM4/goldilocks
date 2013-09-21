@@ -11,7 +11,7 @@ func assert(success bool, t *testing.T, msg string) {
 
 func TestRead(t *testing.T) {
     path := "example.conf.json"
-    config, err := GetConfig(path)
+    config, err := GetConfig([]string{path})
     if err != nil {
         t.Errorf("Got error %v", err)
         return
@@ -87,7 +87,7 @@ func TestRead(t *testing.T) {
 
 func TestValidateFromRead(t *testing.T) {
     path := "example.conf.json"
-    config, err := GetConfig(path)
+    config, err := GetConfig([]string{path})
     if err != nil {
         t.Errorf("Got error %v", err)
         return
@@ -102,7 +102,7 @@ func TestValidateFromRead(t *testing.T) {
 
 func TestValidateNoDefaultRPC(t *testing.T) {
     path := "example.conf.json"
-    config, err := GetConfig(path)
+    config, err := GetConfig([]string{path})
     if err != nil {
         t.Errorf("Got error %v", err)
         return
@@ -122,7 +122,7 @@ func TestValidateNoDefaultRPC(t *testing.T) {
 
 func TestValidateNoStopCommand(t *testing.T) {
     path := "example.conf.json"
-    config, err := GetConfig(path)
+    config, err := GetConfig([]string{path})
     if err != nil {
         t.Errorf("Got error %v", err)
     }

@@ -64,12 +64,12 @@ func GetConfigReader(paths []string) (r io.Reader, err error) {
     return
 }
 
-func GetConfig(path string) (config GLConfig, err error) {
-    paths := []string{
-        path,
+func GetConfig(paths []string) (config GLConfig, err error) {
+    paths = append(
+        paths,
         os.Getenv(ENV_VARIABLE_NAME),
         DEFAULT_PATH,
-    }
+    )
 
     r, err := GetConfigReader(paths)
     if err != nil {

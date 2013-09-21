@@ -1,6 +1,8 @@
 package main
 
 import "fmt"
+import "os"
+//import "html/template"
 
 type Tmpl struct {
 }
@@ -44,6 +46,67 @@ func (tmpl Tmpl) GetDescription() string {
     return TMPL_DESC
 }
 
+func TmplPrintUsage(tmpl *Tmpl) {
+    fmt.Fprintf(
+        os.Stderr,
+        "usage: %s %s\n\n%s\n",
+        "goldilocks",
+        tmpl.GetUsage(),
+        "See `goldilocks help tmpl` for usage.",
+    )
+}
+
+func TmplPrint(config *GLConfig, names []string) {
+    headers := (len(names) > 1)
+
+    for _, name := range names {
+        if headers {
+            fmt.Printf("\n==== %s ====\n", name)
+        }
+        conf_tmpl:= config.Templates[name]
+        fmt.Printf("%s --> %s\n", conf_tmpl.Source, conf_tmpl.Output)
+    }
+}
+
 func (tmpl Tmpl) Run(args []string) {
-    fmt.Printf("Running tmpl...\n")
+    if len(args) < 1 {
+        TmplPrintUsage(&tmpl)
+        return
+    }
+
+    directive := args[0]
+    if directive != "print" && directive != "set" {
+        TmplPrintUsage(&tmpl)
+        return
+    }
+
+    config, err := GetConfig([]string{})
+    if err != nil {
+        fmt.Fprintf(os.Stderr, "goldilocks: %v\n", err)
+        return
+    }
+
+    templates := make([]string, 0)
+    if len(args) > 1 {
+        for _, name := range args[1:] {
+            _, ok := config.Templates[name]
+            if ! ok {
+                fmt.Fprintf(
+                    os.Stderr,
+                    "goldilocks: No template '%s' in config\n",
+                    name,
+                )
+                return
+            }
+            templates = append(templates, name)
+        }
+    } else {
+        for name, _ := range config.Templates {
+            templates = append(templates, name)
+        }
+    }
+
+    if directive == "print" {
+        TmplPrint(&config, templates)
+    }
 }
