@@ -75,6 +75,10 @@ func GetConfig(paths []string) (config GLConfig, err error) {
     if err != nil {
         return
     }
+    defer func() {
+        err := r.Close(); if err != nil { panic(err) }
+    }
+
     config, err = GetConfigFromReader(r)
     if err != nil {
         return

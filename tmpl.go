@@ -121,6 +121,9 @@ func TmplSet(config *GLConfig, names []string) (error) {
         if err != nil {
             return &TmplProcessingError{name,"open output of",source,err}
         }
+        defer func() {
+            err := output_file.Close(); if err != nil { panic(err) }
+        }
 
         err = TmplOutput(output_file, config, name)
         if err != nil { return err }
