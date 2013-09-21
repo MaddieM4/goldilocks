@@ -55,7 +55,7 @@ func GetConfigFromReader(r io.Reader) (config GLConfig, err error) {
 	return
 }
 
-func GetConfigReader(paths []string) (r io.Reader, err error) {
+func GetConfigReader(paths []string) (r io.ReadCloser, err error) {
 	// Get first working reader from paths slice
 	for _, path := range paths {
 		r, err = os.Open(path)

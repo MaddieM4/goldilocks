@@ -38,10 +38,10 @@ func TestRead(t *testing.T) {
 			"sudo /bin/goldilocks_stop",
 			"pgrep nginx",
 		},
-		"",
+		"default",
 	}
 	if service != expected_service {
-		t.Errorf("Incorrect service data")
+		t.Errorf("Incorrect service data:\n%v\n", service)
 		return
 	}
 
@@ -56,10 +56,10 @@ func TestRead(t *testing.T) {
 		"<personal bt addr>",
 		"0.002 BTC",
 		"0 5 * * *",
-		"",
+		"default",
 	}
 	if schedule != expected_schedule {
-		t.Errorf("Incorrect schedule data")
+		t.Errorf("Incorrect schedule data:\n%v\n", service)
 		return
 	}
 
