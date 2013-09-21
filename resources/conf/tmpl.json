@@ -1,5 +1,6 @@
 {
     "meta": {
+        "overview_title": "A simple templating example",
         "admin": "Scooby Doo",
         "contact": "1-800-555-1334"
     },

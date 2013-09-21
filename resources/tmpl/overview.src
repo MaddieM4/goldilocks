@@ -1,0 +1,37 @@
+{{define "service"}}<li>
+            <p>{{.Description}}</p>
+            ({{.Threshold}} at {{.Address}})
+        </li>
+{{end}}
+{{define "schedule"}}<li>
+            <p>{{.From}} =&gt; ({{.To}}</p>
+            <p>{{.Amount}} every {{.Frequency}}</p>
+        </li>
+{{end}}
+{{define "template_meta"}}<li>
+            {{.Source}} =&gt; {{.Output}}
+        </li>
+{{end}}
+<html>
+<head>
+    <title>{{.Meta.overview_title}}</title>
+</head>
+<body>
+    <h1>Config</h1>
+
+    <h2>Services</h2>
+    <ul>
+{{ range .Services }}       {{template "service" .}}{{end}}
+    </ul>
+
+    <h2>Schedules</h2>
+    <ul>
+{{ range .Schedules }}       {{template "schedule" .}}{{end}}
+    </ul>
+
+    <h2>Templates</h2>
+    <ul>
+{{ range .Templates }}       {{template "template_meta" .}}{{end}}
+    </ul>
+</body>
+</html>

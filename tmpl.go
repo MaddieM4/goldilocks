@@ -78,7 +78,7 @@ func TmplPrint(config *GLConfig, names []string) {
             return
         }
 
-        err = tmpl_obj.Execute(os.Stdout, conf_tmpl)
+        err = tmpl_obj.Execute(os.Stdout, config)
         if err != nil {
             fmt.Fprintf(
                 os.Stderr,
