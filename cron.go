@@ -30,17 +30,17 @@ goldilocks cron set somename
 `
 
 func (cron Cron) GetName() string {
-    return "cron"
+	return "cron"
 }
 
 func (cron Cron) GetUsage() string {
-    return cron.GetName() + " ( set | print ) [ name ]"
+	return cron.GetName() + " ( set | print ) [ name ]"
 }
 
 func (cron Cron) GetDescription() string {
-    return CRON_DESC
+	return CRON_DESC
 }
 
 func (cron Cron) Run(args []string) {
-    fmt.Printf("Running cron...\n")
+	fmt.Printf("Running cron...\n")
 }

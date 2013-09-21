@@ -22,33 +22,33 @@ goldilocks help help
 `
 
 func (help Help) GetName() string {
-    return "help"
+	return "help"
 }
 
 func (help Help) GetUsage() string {
-    return help.GetName() + " COMMAND"
+	return help.GetName() + " COMMAND"
 }
 
 func (help Help) GetDescription() string {
-    return HELP_DESC
+	return HELP_DESC
 }
 
 func doHelp(cmnd GLSubcommand) {
-    fmt.Printf(":: %s\n%s\n", cmnd.GetUsage(), cmnd.GetDescription())
+	fmt.Printf(":: %s\n%s\n", cmnd.GetUsage(), cmnd.GetDescription())
 }
 
 func (help Help) Run(args []string) {
-    if len(args) == 0 {
-        usage()
-    } else {
-        cmnd_map := getSubcommandMap()
-        for _, value := range args {
-            cmnd, ok := cmnd_map[value]
-            if ok {
-                doHelp(cmnd)
-            } else {
-                fmt.Printf("No subcommand '%s'\n", value)
-            }
-        }
-    }
+	if len(args) == 0 {
+		usage()
+	} else {
+		cmnd_map := getSubcommandMap()
+		for _, value := range args {
+			cmnd, ok := cmnd_map[value]
+			if ok {
+				doHelp(cmnd)
+			} else {
+				fmt.Printf("No subcommand '%s'\n", value)
+			}
+		}
+	}
 }
