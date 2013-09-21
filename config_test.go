@@ -2,6 +2,9 @@ package main
 
 import "testing"
 
+const PATH_EXAMPLE  = "resources/conf/example.json"
+const PATH_TEMPLATE = "resources/conf/tmpl.json"
+
 func assert(success bool, t *testing.T, msg string) {
     if success == false {
         t.Errorf(msg)
@@ -10,8 +13,7 @@ func assert(success bool, t *testing.T, msg string) {
 }
 
 func TestRead(t *testing.T) {
-    path := "example.conf.json"
-    config, err := GetConfig([]string{path})
+    config, err := GetConfig([]string{PATH_EXAMPLE})
     if err != nil {
         t.Errorf("Got error %v", err)
         return
@@ -86,8 +88,7 @@ func TestRead(t *testing.T) {
 }
 
 func TestValidateFromRead(t *testing.T) {
-    path := "example.conf.json"
-    config, err := GetConfig([]string{path})
+    config, err := GetConfig([]string{PATH_EXAMPLE})
     if err != nil {
         t.Errorf("Got error %v", err)
         return
@@ -101,8 +102,7 @@ func TestValidateFromRead(t *testing.T) {
 }
 
 func TestValidateNoDefaultRPC(t *testing.T) {
-    path := "example.conf.json"
-    config, err := GetConfig([]string{path})
+    config, err := GetConfig([]string{PATH_EXAMPLE})
     if err != nil {
         t.Errorf("Got error %v", err)
         return
@@ -121,8 +121,7 @@ func TestValidateNoDefaultRPC(t *testing.T) {
 }
 
 func TestValidateNoStopCommand(t *testing.T) {
-    path := "example.conf.json"
-    config, err := GetConfig([]string{path})
+    config, err := GetConfig([]string{PATH_EXAMPLE})
     if err != nil {
         t.Errorf("Got error %v", err)
     }

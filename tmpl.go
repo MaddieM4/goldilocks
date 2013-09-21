@@ -2,7 +2,7 @@ package main
 
 import "fmt"
 import "os"
-//import "html/template"
+import "html/template"
 
 type Tmpl struct {
 }
@@ -63,8 +63,32 @@ func TmplPrint(config *GLConfig, names []string) {
         if headers {
             fmt.Printf("\n==== %s ====\n", name)
         }
-        conf_tmpl:= config.Templates[name]
-        fmt.Printf("%s --> %s\n", conf_tmpl.Source, conf_tmpl.Output)
+
+        conf_tmpl := config.Templates[name]
+
+        tmpl_obj, err := template.ParseFiles(conf_tmpl.Source)
+        if err != nil {
+            fmt.Fprintf(
+                os.Stderr,
+                "goldilocks: Failed to parse template '%s' (%s):\n%v\n",
+                name,
+                conf_tmpl.Source,
+                err,
+            )
+            return
+        }
+
+        err = tmpl_obj.Execute(os.Stdout, conf_tmpl)
+        if err != nil {
+            fmt.Fprintf(
+                os.Stderr,
+                "goldilocks: Failed to exec template '%s' (%s):\n%v\n",
+                name,
+                conf_tmpl.Source,
+                err,
+            )
+            return
+        }
     }
 }
 
